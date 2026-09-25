@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ruthra Mart</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
+body{background:#e9f6f4}
+header{background:linear-gradient(135deg,#06185f,#1456c0);color:#fff;padding:20px 6%;text-align:center}
+header input{width:60%;padding:12px;border:0;border-radius:10px;margin:12px 0}
+button{background:#17428f;color:#fff;border:0;padding:10px 16px;border-radius:8px;cursor:pointer;font-weight:bold;margin:3px}
+nav button{background:#fff;color:#17428f}
+h2{color:#17428f;text-align:center;margin-bottom:20px}
+.page{display:none;padding:35px 7%;min-height:70vh}
+.active{display:block}
+.hero{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:60px 20px;border-radius:22px;text-align:center}
+.hero button{background:#ffd21c;color:#222;margin-top:20px}
+.box,.card{background:#fff;border-radius:16px;box-shadow:0 5px 20px #0002;padding:25px}
+.box{max-width:450px;margin:auto}
+.box input,.box select{width:100%;padding:12px;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px}
+.card{text-align:center;margin-bottom:15px}
+.card span{font-size:60px;display:block}
+.price{color:#e53935;font-weight:bold;font-size:20px;margin:10px 0}
+</style>
+</head>
+<body>
+
+<header>
+<h1>🛍️ Ruthra Mart</h1>
+<input id="q" placeholder="Search products..." onkeyup="search()">
+<p id="status"></p>
+<nav>
+<button onclick="show('home')">🏠 Home</button>
+<button onclick="show('products')">🛍️ Products</button>
+<button onclick="show('login')">🔐 Login</button>
+<button onclick="show('register')">📝 Register</button>
+<button onclick="show('cart')">🛒 Cart (<span id="count">0</span>)</button>
+<button onclick="show('orders')">📦 Orders</button>
+<button id="dashBtn" onclick="show('dash')" style="display:none">🧑‍💼 Dashboard</button>
+<button onclick="logout()">🚪 Logout</button>
+</nav>
+</header>
+
+<div id="home" class="page">
+<div class="hero"><h1>Welcome to Roshini Mart 🛍️</h1><p>Your simple and smart online shopping website</p><button onclick="show('products')">🛍️ Shop Now</button></div>
+</div>
+
+<div id="products" class="page"><h2>🛍️ Our Products</h2><div id="list" class="grid"></div></div>
+
+<div id="login" class="page"><div class="box"><h2>🔐 Login</h2>
+<input id="le" placeholder="Email">
+<input id="lp" type="password" placeholder="Password">
+<select id="lr"><option value="">Select your role</option><option value="buyer">Buyer</option><option value="seller">Seller</option><option value="admin">Admin</option></select>
+<button onclick="login()">🔐 Login</button></div></div>
+
+<div id="register" class="page"><div class="box"><h2>📝 Create Account</h2>
+<input id="rn" placeholder="Full Name">
+<input id="re" placeholder="Email">
+<input id="rp" type="password" placeholder="Password">
+<select id="rr"><option value="">Select your role</option><option value="buyer">Buyer</option><option value="seller">Seller</option><option value="admin">Admin</option></select>
+<button onclick="register()">📝 Register</button></div></div>
+
+<div id="cart" class="page"><h2>🛒 My Shopping Cart</h2><div id="cartList"></div>
+<div class="box"><h2>Total: ₹<span id="total">0</span></h2><button onclick="checkout()">📦 Place Order</button></div></div>
+
+<div id="checkout" class="page"><div class="box"><h2>📦 Delivery Details</h2>
+<input id="cn" placeholder="Customer Name">
+<input id="ca" placeholder="Delivery Address">
+<input id="cp" placeholder="Phone Number">
+<select id="pay"><option value="">Select Payment Method</option><option>Cash on Delivery</option><option>UPI</option><option>Credit / Debit Card</option></select>
+<button onclick="placeOrder()">🛍️ Place Order</button></div></div>
+
+<div id="orders" class="page"><h2>📦 Order History</h2><div id="orderList"></div></div>
+
+<div id="dash" class="page"><div id="dashBox"></div></div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+// 1. Products: icon, name, price
+const products = [
+["📱","iPhone 15",69999],["📲","Samsung Galaxy",49999],["💻","HP Laptop",59999],["🖥️","Dell Laptop",64999],
+["📺","Samsung Smart TV",39999],["📺","LG Smart TV",52999],["📺","Sony Bravia TV",74999],["📺","Mi Smart TV",29999],
+["👔","Formal Shirt",1299],["👕","Casual Shirt",999],["🧥","Denim Shirt",1499],["👕","Premium T-Shirt",699],
+["👕","Polo T-Shirt",899],["🎽","Printed T-Shirt",799],["👟","Running Shoes",2499],["👞","Casual Shoes",1999],
+["🥾","Sports Shoes",2799],["🎧","Wireless Headphones",2999],["⌚","Smart Watch",4999],["📷","Digital Camera",34999],
+["🧊","Double Door Refrigerator",42999],["🧺","Washing Machine",28999],["🥤","Mixer Grinder",3499]
+];
+
+// 2. All data is kept in one object and saved in the browser
+let db = JSON.parse(localStorage.shop || "null") || {
+  users: [{name:"Vignesh K", email:"karuppannanvignesh10@gmail.com", pass:"1234", role:"admin"},
+          {name:"Pavithraa", email:"pavithraa10@gmail.com", pass:"1234", role:"seller"}],
+  carts: {}, orders: [], items: [], me: null
+};
+const cart = () => db.me ? (db.carts[db.me.email] ||= []) : [];
+const save = () => { localStorage.shop = JSON.stringify(db); refresh(); };
+
+// top bar: login status, cart count, dashboard button
+function refresh(){
+  $("status").innerText = db.me ? "Logged in (" + db.me.role + ") " + db.me.email : "Not Logged In";
+  $("count").innerText = cart().reduce((t, i) => t + i.qty, 0);
+  $("dashBtn").style.display = db.me && db.me.role != "buyer" ? "" : "none";
+}
+
+// 3. Show one page at a time
+function show(id){
+  if(["cart","checkout","orders","dash"].includes(id) && !db.me){ alert("Please login first 🔐"); id = "login"; }
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  $(id).classList.add("active");
+  if(id == "cart") showCart();
+  if(id == "orders") showOrders();
+  if(id == "dash") dash();
+  window.scrollTo(0, 0);
+}
+
+// 4. Products list and search
+$("list").innerHTML = products.map(p => `<div class="card"><span>${p[0]}</span><h3>${p[1]}</h3>
+  <div class="price">₹${p[2].toLocaleString()}</div>
+  <button onclick="add('${p[1]}',${p[2]})">🛒 Add to Cart</button></div>`).join("");
+
+function search(){
+  let text = $("q").value.toLowerCase();
+  if(text) show("products");
+  document.querySelectorAll("#list .card").forEach(c => c.style.display = c.textContent.toLowerCase().includes(text) ? "" : "none");
+}
+
+// 5. Register, login, logout
+function register(){
+  let u = {name:$("rn").value.trim(), email:$("re").value.trim().toLowerCase(), pass:$("rp").value, role:$("rr").value};
+  if(!u.name || !u.email || !u.pass || !u.role) return alert("Please fill all details ❌");
+  if(db.users.find(x => x.email == u.email)) return alert("Email already registered ❌");
+  db.users.push(u); save();
+  alert("Registration successful 🎉"); show("login");
+}
+
+function login(){
+  let u = db.users.find(x => x.email == $("le").value.trim().toLowerCase() && x.pass == $("lp").value && x.role == $("lr").value);
+  if(!u) return alert("Invalid email, password or role ❌");
+  db.me = u; save();
+  alert("Welcome " + u.name + " (" + u.role + ") 👋");
+  show(u.role == "buyer" ? "products" : "dash");
+}
+
+function logout(){
+  if(!db.me) return alert("No user is logged in.");
+  db.me = null; save();
+  alert("Logout successful 👋"); show("home");
+}
+
+// 6. Cart
+function add(name, price){
+  if(!db.me){ alert("Please login before adding products 🔐"); return show("login"); }
+  let item = cart().find(i => i.name == name);
+  item ? item.qty++ : cart().push({name, price, qty:1});
+  save(); alert(name + " added to your cart 🛒");
+}
+
+function change(i, n){                 // n = +1, -1 (or -99 to remove)
+  let c = cart();
+  c[i].qty += n;
+  if(c[i].qty < 1) c.splice(i, 1);
+  save(); showCart();
+}
+
+function showCart(){
+  let total = 0;
+  $("cartList").innerHTML = cart().map((item, i) => {
+    total += item.price * item.qty;
+    return `<div class="card"><h3>${item.name}</h3><p>₹${item.price.toLocaleString()}</p>
+      <button onclick="change(${i},-1)">−</button> <b>${item.qty}</b> <button onclick="change(${i},1)">+</button>
+      <p><b>₹${(item.price * item.qty).toLocaleString()}</b></p>
+      <button onclick="change(${i},-99)">❌ Remove</button></div>`;
+  }).join("") || `<div class="card"><h3>🛒 Your Cart is Empty</h3></div>`;
+  $("total").innerText = total.toLocaleString();
+}
+
+// 7. Checkout and orders
+function checkout(){
+  if(!cart().length){ alert("Your cart is empty 🛒"); return show("products"); }
+  $("cn").value = db.me.name;
+  show("checkout");
+}
+
+function placeOrder(){
+  let name = $("cn").value.trim(), address = $("ca").value.trim(), phone = $("cp").value.trim(), pay = $("pay").value;
+  if(!name || !address || !phone || !pay) return alert("Please fill all details ❌");
+  let c = cart();
+  db.orders.push({email:db.me.email, name, address, phone, pay,
+    items: c.map(i => i.name + " × " + i.qty).join("<br>"),
+    total: c.reduce((t, i) => t + i.price * i.qty, 0),
+    date: new Date().toLocaleDateString("en-IN")});
+  db.carts[db.me.email] = [];
+  save(); alert("Order placed successfully! 🎉"); show("orders");
+}
+
+function orderCard(o, n){
+  return `<div class="card" style="text-align:left"><h3>📦 Order #${n}</h3>
+    <p><b>Customer:</b> ${o.name}</p><p><b>Address:</b> ${o.address}</p><p><b>Phone:</b> ${o.phone}</p>
+    <p><b>Payment:</b> ${o.pay}</p><p><b>Products:</b><br>${o.items}</p>
+    <p><b>Total:</b> ₹${o.total.toLocaleString()}</p><p><b>Status:</b> Pending</p><p><b>Date:</b> ${o.date}</p></div>`;
+}
+
+function showOrders(){
+  let mine = db.orders.filter(o => o.email == db.me.email);
+  $("orderList").innerHTML = mine.map((o, i) => orderCard(o, i + 1)).reverse().join("") || `<div class="card"><h3>📦 No Orders Yet</h3></div>`;
+}
+
+// 8. Seller and admin dashboard
+function dash(){
+  if(db.me.role == "seller"){
+    $("dashBox").innerHTML = `<div class="box"><h2>➕ Add New Product</h2>
+      <input id="pn" placeholder="Product Name"><input id="pp" type="number" placeholder="Price (₹)">
+      <button onclick="addItem()">➕ Add Product</button></div>
+      <h2 style="margin-top:30px">📦 My Listed Products</h2><div class="grid">` +
+      db.items.filter(i => i.by == db.me.email).map(i => `<div class="card"><h3>${i.name}</h3><div class="price">₹${i.price.toLocaleString()}</div></div>`).join("") + `</div>`;
+  } else {
+    $("dashBox").innerHTML = "<h2>👥 Registered Users</h2>" +
+      db.users.map(u => `<div class="card"><b>${u.name}</b> (${u.role})<br>${u.email}</div>`).join("") +
+      "<h2>📦 All Orders</h2>" + db.orders.map((o, i) => orderCard(o, i + 1)).join("");
+  }
+}
+
+function addItem(){
+  let name = $("pn").value.trim(), price = Number($("pp").value);
+  if(!name || !price) return alert("Please fill all product details ❌");
+  db.items.push({name, price, by:db.me.email});
+  save(); alert("Product added 🎉"); dash();
+}
+
+show("login");
+refresh();
+</script>
+
+</body>
