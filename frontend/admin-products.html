@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products Oversight - RuthraMart Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="/index.html" class="brand-logo">
+                <div class="brand-logo-text">
+                    <div class="brand-top">RUTHRA</div>
+                    <div class="brand-bottom">MART</div>
+                </div>
+            </a>
+            <div style="color: var(--light); font-weight: 700;">Administrative Portal</div>
+            <ul class="nav-links">
+                <li><a href="/index.html" class="nav-link">Storefront</a></li>
+                <li id="nav-auth-links"></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="dashboard-wrapper">
+        <aside class="dashboard-sidebar">
+            <div class="sidebar-title">Admin Console</div>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item">
+                    <a href="/admin-dashboard.html"><i class="fa-solid fa-chart-pie"></i> Overview</a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="/admin-users.html"><i class="fa-solid fa-users"></i> Users & Roles</a>
+                </li>
+                <li class="sidebar-item active">
+                    <a href="/admin-products.html"><i class="fa-solid fa-boxes-stacked"></i> Products Oversight</a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="/admin-orders.html"><i class="fa-solid fa-clipboard-list"></i> Platform Orders</a>
+                </li>
+                <li class="sidebar-item" style="margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 16px;">
+                    <a href="javascript:void(0)" onclick="auth.logout()"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="dashboard-main">
+            <div id="alert-box" class="alert" style="display: none;"></div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <div>
+                    <h1 style="font-size: 2rem; color: var(--secondary);">Catalog Oversight</h1>
+                    <p style="color: var(--text-secondary);">Review listings across all sellers and moderate content</p>
+                </div>
+
+                <div style="position: relative; width: 280px;">
+                    <input type="text" id="admin-search-input" class="form-control" placeholder="Search catalog..." oninput="handleSearch(this.value)">
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Product Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Seller</th>
+                            <th>Moderation</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-products-body">
+                        <tr><td colspan="7" style="text-align: center; color: var(--text-secondary);">Loading catalog...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal-overlay" id="confirm-delete-modal">
+        <div class="modal-card">
+            <div style="width: 50px; height: 50px; border-radius: var(--radius-full); background: #FDE8E8; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                <i class="fa-solid fa-triangle-exclamation" style="color: var(--error); font-size: 1.4rem;"></i>
+            </div>
+            <h3 style="color: var(--secondary); margin-bottom: 8px;">Confirm Product Removal</h3>
+            <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 24px;">
+                Are you sure you want to remove this product? This action will take the product down from the public storefront.
+            </p>
+            <div style="display: flex; gap: 12px;">
+                <button id="modal-confirm-btn" class="btn btn-danger" style="flex: 1;">Yes, Remove Product</button>
+                <button onclick="closeConfirmModal()" class="btn btn-secondary" style="flex: 1;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/chatbot.js"></script>
+    <script>
+        let allProducts = [];
+        let productToDeleteId = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!auth.requireAuth(['ADMIN'])) return;
+            await loadProducts();
+        });
+
+        async function loadProducts() {
+            try {
+                allProducts = await api.get('/admin/products');
+                renderProducts(allProducts);
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function renderProducts(items) {
+            const tbody = document.getElementById('admin-products-body');
+            tbody.innerHTML = items.map(p => `
+                <tr>
+                    <td>
+                        <img src="${p.imageUrl || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=80'}" 
+                             alt="${p.name}" style="width: 44px; height: 44px; object-fit: cover; border-radius: var(--radius-sm);">
+                    </td>
+                    <td><strong>${p.name}</strong></td>
+                    <td>${p.category}</td>
+                    <td><strong style="color: var(--secondary);">${api.formatCurrency(p.price)}</strong></td>
+                    <td>${p.stockQuantity}</td>
+                    <td><small style="font-weight: 600; color: var(--primary);">${p.sellerName || 'Seller #' + p.sellerId}</small></td>
+                    <td>
+                        <button class="btn btn-outline btn-sm" style="color: var(--error); border-color: #f0c5c5;" 
+                                onclick="promptDelete(${p.id})">
+                            <i class="fa-solid fa-trash"></i> Remove
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function handleSearch(q) {
+            const term = q.toLowerCase();
+            const filtered = allProducts.filter(p => 
+                p.name.toLowerCase().includes(term) || 
+                p.category.toLowerCase().includes(term) || 
+                (p.sellerName && p.sellerName.toLowerCase().includes(term))
+            );
+            renderProducts(filtered);
+        }
+
+        function promptDelete(id) {
+            productToDeleteId = id;
+            document.getElementById('confirm-delete-modal').classList.add('active');
+            document.getElementById('modal-confirm-btn').onclick = executeDelete;
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirm-delete-modal').classList.remove('active');
+            productToDeleteId = null;
+        }
+
+        async function executeDelete() {
+            if (!productToDeleteId) return;
+            try {
+                await api.delete(`/admin/products/${productToDeleteId}`);
+                api.showAlert('Product removed successfully.', 'success');
+                closeConfirmModal();
+                await loadProducts();
+            } catch (e) {
+                api.showAlert(e.message || 'Failed to remove product', 'error');
+            }
+        }
+    </script>
+</body>
+</html>

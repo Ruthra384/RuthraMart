@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users & Roles - RuthraMart Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="/index.html" class="brand-logo">
+                <div class="brand-logo-text">
+                    <div class="brand-top">RUTHRA</div>
+                    <div class="brand-bottom">MART</div>
+                </div>
+            </a>
+            <div style="color: var(--light); font-weight: 700;">Administrative Portal</div>
+            <ul class="nav-links">
+                <li><a href="/index.html" class="nav-link">Storefront</a></li>
+                <li id="nav-auth-links"></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="dashboard-wrapper">
+        <aside class="dashboard-sidebar">
+            <div class="sidebar-title">Admin Console</div>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item">
+                    <a href="/admin-dashboard.html"><i class="fa-solid fa-chart-pie"></i> Overview</a>
+                </li>
+                <li class="sidebar-item active">
+                    <a href="/admin-users.html"><i class="fa-solid fa-users"></i> Users & Roles</a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="/admin-products.html"><i class="fa-solid fa-boxes-stacked"></i> Products Oversight</a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="/admin-orders.html"><i class="fa-solid fa-clipboard-list"></i> Platform Orders</a>
+                </li>
+                <li class="sidebar-item" style="margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 16px;">
+                    <a href="javascript:void(0)" onclick="auth.logout()"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="dashboard-main">
+            <div id="alert-box" class="alert" style="display: none;"></div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <div>
+                    <h1 style="font-size: 2rem; color: var(--secondary);">User Accounts</h1>
+                    <p style="color: var(--text-secondary);">Registered buyers, sellers, and system administrators</p>
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn btn-primary btn-sm user-filter-btn" onclick="filterUsers('ALL')">All</button>
+                    <button class="btn btn-outline btn-sm user-filter-btn" onclick="filterUsers('BUYER')">Buyers</button>
+                    <button class="btn btn-outline btn-sm user-filter-btn" onclick="filterUsers('SELLER')">Sellers</button>
+                    <button class="btn btn-outline btn-sm user-filter-btn" onclick="filterUsers('ADMIN')">Admins</button>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>User ID</th>
+                            <th>Full Name</th>
+                            <th>Email Address</th>
+                            <th>Phone</th>
+                            <th>Role</th>
+                            <th>Joined Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-users-body">
+                        <tr><td colspan="6" style="text-align: center; color: var(--text-secondary);">Loading accounts...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/chatbot.js"></script>
+    <script>
+        let allUsers = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!auth.requireAuth(['ADMIN'])) return;
+            await loadUsers();
+        });
+
+        async function loadUsers() {
+            try {
+                allUsers = await api.get('/admin/users');
+                renderUserList(allUsers);
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function renderUserList(users) {
+            const tbody = document.getElementById('admin-users-body');
+            tbody.innerHTML = users.map(u => {
+                let badgeClass = 'badge-confirmed';
+                if (u.role === 'ADMIN') badgeClass = 'badge-cancelled';
+                else if (u.role === 'SELLER') badgeClass = 'badge-shipped';
+
+                return `
+                    <tr>
+                        <td><strong>#${u.id}</strong></td>
+                        <td><strong>${u.name}</strong></td>
+                        <td>${u.email}</td>
+                        <td>${u.phone || 'N/A'}</td>
+                        <td><span class="badge ${badgeClass}">${u.role}</span></td>
+                        <td>${api.formatDate(u.createdAt)}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filterUsers(role) {
+            if (role === 'ALL') {
+                renderUserList(allUsers);
+            } else {
+                renderUserList(allUsers.filter(u => u.role === role));
+            }
+        }
+    </script>
+</body>
+</html>

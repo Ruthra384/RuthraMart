@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - RuthraMart</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="/index.html" class="brand-logo">
+                <div class="brand-logo-text">
+                    <div class="brand-top">RUTHRA</div>
+                    <div class="brand-bottom">MART</div>
+                </div>
+            </a>
+            <ul class="nav-links">
+                <li><a href="/index.html" class="nav-link">Home</a></li>
+                <li><a href="/products.html" class="nav-link">Products</a></li>
+                <li><a href="/cart.html" class="nav-link">Cart</a></li>
+                <li><a href="/orders.html" class="nav-link">Orders</a></li>
+                <li id="nav-auth-links"></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- CONTENT -->
+    <div class="container" style="padding: 40px 20px 80px;">
+        <div id="alert-box" class="alert" style="display: none;"></div>
+
+        <h1 style="font-size: 2.2rem; color: var(--secondary); margin-bottom: 24px;">Secure Checkout</h1>
+
+        <div class="cart-layout">
+            <!-- Checkout Form -->
+            <div style="background-color: var(--white); border-radius: var(--radius-lg); border: 1px solid var(--input-border); padding: 32px; box-shadow: var(--shadow-sm);">
+                <h3 style="font-size: 1.35rem; color: var(--secondary); margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-location-dot" style="color: var(--primary);"></i> Delivery & Contact Details
+                </h3>
+
+                <form onsubmit="ordersManager.confirmOrder(event)">
+                    <div class="form-group">
+                        <label class="form-label" for="checkout-name">Recipient Full Name</label>
+                        <input type="text" id="checkout-name" class="form-control" required placeholder="John Doe">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div class="form-group">
+                            <label class="form-label" for="checkout-email">Email Address</label>
+                            <input type="email" id="checkout-email" class="form-control" required placeholder="name@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="checkout-phone">Phone Number</label>
+                            <input type="tel" id="checkout-phone" class="form-control" required placeholder="9876543210">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="checkout-address">Delivery Address</label>
+                        <textarea id="checkout-address" class="form-control" rows="3" required placeholder="Door no, Building name, Street, Landmark, City, State & PIN Code"></textarea>
+                    </div>
+
+                    <div style="background-color: var(--bg); padding: 16px; border-radius: var(--radius-md); border: 1px solid #f0eee8; margin-top: 24px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <i class="fa-solid fa-money-bill-wave" style="color: var(--success); font-size: 1.4rem;"></i>
+                            <div>
+                                <strong style="color: var(--secondary);">Payment Method: Simulation / Cash on Delivery</strong>
+                                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 2px;">Pay safely upon receiving your order. No card charges today.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="confirm-order-btn" class="btn btn-primary btn-block btn-lg" style="margin-top: 28px;">
+                        <i class="fa-solid fa-lock"></i> CONFIRM ORDER
+                    </button>
+                </form>
+            </div>
+
+            <!-- Order Summary Section -->
+            <div class="cart-summary-card">
+                <h3 class="summary-title">ORDER SUMMARY</h3>
+                <div id="checkout-items-list" style="max-height: 280px; overflow-y: auto; margin-bottom: 20px; padding-right: 6px;">
+                    <!-- Rendered by ordersManager.loadCheckoutSummary() -->
+                </div>
+
+                <div class="summary-row">
+                    <span>Shipping Charges:</span>
+                    <span style="color: var(--success); font-weight: 700;">FREE</span>
+                </div>
+                <div class="summary-row total">
+                    <span>Total Amount:</span>
+                    <span id="checkout-total-amount">₹0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ORDER SUCCESS MODAL -->
+    <div class="modal-overlay" id="order-success-modal">
+        <div class="modal-card" style="text-align: center;">
+            <div style="width: 70px; height: 70px; background-color: var(--secondary-section); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                <i class="fa-solid fa-circle-check fa-3x" style="color: var(--success);"></i>
+            </div>
+            <h2 style="color: var(--secondary); margin-bottom: 8px;">ORDER SUCCESSFUL!</h2>
+            <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 20px;">
+                Thank you for shopping with RuthraMart. Your order has been placed successfully and is being prepared.
+            </p>
+
+            <div style="background-color: var(--card); padding: 16px; border-radius: var(--radius-md); margin-bottom: 24px; text-align: left; border: 1px solid #d8d8cc;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="color: var(--text-secondary);">Order ID:</span>
+                    <strong id="success-order-id" style="color: var(--primary); font-size: 1.1rem;"></strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-secondary);">Total Paid:</span>
+                    <strong id="success-order-total" style="color: var(--secondary); font-size: 1.1rem;"></strong>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 12px;">
+                <a href="/orders.html" class="btn btn-primary" style="flex: 1;">View My Orders</a>
+                <a href="/products.html" class="btn btn-secondary" style="flex: 1;">Keep Shopping</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/orders.js"></script>
+    <script src="/js/chatbot.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            ordersManager.initCheckout();
+        });
+    </script>
+</body>
+</html>

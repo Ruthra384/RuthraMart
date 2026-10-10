@@ -1,10 +1,7 @@
 package com.ruthramart.RuthraMart.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "products")
@@ -14,17 +11,47 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String name;
+
+    @Column(length = 2000)
+    private String description;
+
+    @Column(nullable = false)
+    private String category;
+
+    @Column(nullable = false)
     private double price;
-    private int quantity;
+
+    @Column(name = "stock_quantity", nullable = false)
+    private int stockQuantity;
+
+    @Column(name = "image_url")
+    private String imageUrl;
+
+    @Column(name = "seller_id", nullable = false)
+    private Long sellerId;
+
+    @Column(name = "seller_name")
+    private String sellerName;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
     public Product() {
+        this.createdAt = LocalDateTime.now();
     }
 
-    public Product(String name, double price, int quantity) {
+    public Product(String name, String description, String category, double price, int stockQuantity, String imageUrl, Long sellerId, String sellerName) {
         this.name = name;
+        this.description = description;
+        this.category = category;
         this.price = price;
-        this.quantity = quantity;
+        this.stockQuantity = stockQuantity;
+        this.imageUrl = imageUrl;
+        this.sellerId = sellerId;
+        this.sellerName = sellerName;
+        this.createdAt = LocalDateTime.now();
     }
 
     public Long getId() {
@@ -43,6 +70,22 @@ public class Product {
         this.name = name;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
     public double getPrice() {
         return price;
     }
@@ -51,11 +94,43 @@ public class Product {
         this.price = price;
     }
 
-    public int getQuantity() {
-        return quantity;
+    public int getStockQuantity() {
+        return stockQuantity;
     }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public void setStockQuantity(int stockQuantity) {
+        this.stockQuantity = stockQuantity;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public Long getSellerId() {
+        return sellerId;
+    }
+
+    public void setSellerId(Long sellerId) {
+        this.sellerId = sellerId;
+    }
+
+    public String getSellerName() {
+        return sellerName;
+    }
+
+    public void setSellerName(String sellerName) {
+        this.sellerName = sellerName;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }

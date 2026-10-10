@@ -1,10 +1,7 @@
 package com.ruthramart.RuthraMart.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
@@ -14,19 +11,35 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false, unique = true)
     private String email;
+
+    @Column(nullable = false)
+    private String phone;
+
+    @Column(nullable = false)
     private String password;
-    private String role;
+
+    @Column(nullable = false)
+    private String role; // BUYER, SELLER, ADMIN
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
     public User() {
+        this.createdAt = LocalDateTime.now();
     }
 
-    public User(String name, String email, String password, String role) {
+    public User(String name, String email, String phone, String password, String role) {
         this.name = name;
         this.email = email;
+        this.phone = phone;
         this.password = password;
         this.role = role;
+        this.createdAt = LocalDateTime.now();
     }
 
     public Long getId() {
@@ -53,6 +66,14 @@ public class User {
         this.email = email;
     }
 
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
     public String getPassword() {
         return password;
     }
@@ -67,5 +88,13 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }

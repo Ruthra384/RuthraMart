@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: ruthramart
+    runtime: docker
+    plan: free
+    region: oregon
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: SPRING_DATASOURCE_URL
+        value: jdbc:h2:file:./data/ruthramart;DB_CLOSE_DELAY=-1;MODE=MySQL
+      - key: SPRING_DATASOURCE_USERNAME
+        value: sa
+      - key: SPRING_DATASOURCE_PASSWORD
+        value: ""

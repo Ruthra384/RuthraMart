@@ -1,10 +1,270 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>RuthraMart</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RuthraMart - Multi Seller Online Shopping</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <h1>Welcome to RuthraMart</h1>
-    <p>RuthraMart application is running successfully!</p>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="/index.html" class="brand-logo">
+                <div class="brand-logo-text">
+                    <div class="brand-top">RUTHRA</div>
+                    <div class="brand-bottom">MART</div>
+                </div>
+            </a>
+
+            <div class="nav-search">
+                <form onsubmit="event.preventDefault(); window.location.href='/products.html?query=' + encodeURIComponent(document.getElementById('nav-search-input').value);">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" id="nav-search-input" placeholder="Search laptops, fashion, decor, books...">
+                </form>
+            </div>
+
+            <button class="nav-toggle" id="nav-toggle"><i class="fa-solid fa-bars"></i></button>
+
+            <ul class="nav-links" id="nav-links">
+                <li><a href="/index.html" class="nav-link active">Home</a></li>
+                <li><a href="/products.html" class="nav-link">Products</a></li>
+                <li><a href="/products.html#categories-section" class="nav-link">Categories</a></li>
+                <li>
+                    <a href="/cart.html" class="nav-link">
+                        <i class="fa-solid fa-cart-shopping"></i> Cart
+                        <span class="cart-badge" id="cart-count">0</span>
+                    </a>
+                </li>
+                <li><a href="/orders.html" class="nav-link"><i class="fa-solid fa-bag-shopping"></i> Orders</a></li>
+                <li id="nav-auth-links" style="display: flex; align-items: center; gap: 12px;">
+                    <!-- Injected dynamically by auth.js -->
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- ALERT NOTIFICATION -->
+    <div class="container" style="margin-top: 16px;">
+        <div id="alert-box" class="alert" style="display: none;"></div>
+    </div>
+
+    <!-- HERO SECTION -->
+    <section class="hero-section">
+        <div class="container hero-grid">
+            <div class="hero-content">
+                <span style="display: inline-block; background-color: var(--card); color: var(--secondary); padding: 6px 14px; border-radius: var(--radius-full); font-size: 0.85rem; font-weight: 700; margin-bottom: 16px; letter-spacing: 0.5px; text-transform: uppercase;">
+                    🌿 Handpicked Quality & Multi-Seller Hub
+                </span>
+                <h1>Thoughtful Finds for Everyday Living</h1>
+                <p>Discover products you love, all in one beautiful place. Shop premium electronics, artisanal home decor, sustainable fashion, and timeless books from verified creators.</p>
+                <div class="hero-buttons">
+                    <a href="/products.html" class="btn btn-primary btn-lg">
+                        <i class="fa-solid fa-bag-shopping"></i> Explore Products
+                    </a>
+                    <a href="/products.html#categories-section" class="btn btn-secondary btn-lg">
+                        <i class="fa-solid fa-layer-group"></i> Browse Categories
+                    </a>
+                </div>
+            </div>
+            <div class="hero-image-wrap">
+                <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&auto=format&fit=crop&q=80" 
+                     alt="RuthraMart Curated Living" class="hero-image">
+            </div>
+        </div>
+    </section>
+
+    <!-- CATEGORIES SECTION -->
+    <section class="section" id="categories-section">
+        <div class="container">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">Shop by Category</h2>
+                    <p style="color: var(--text-secondary); margin-top: 4px;">Explore our curated selection of essentials</p>
+                </div>
+                <a href="/products.html" class="btn btn-outline btn-sm">View All <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+
+            <div class="categories-grid" id="home-categories-grid">
+                <a href="/products.html?category=Electronics" class="category-card">
+                    <i class="fa-solid fa-laptop cat-icon"></i>
+                    <span class="cat-name">Electronics</span>
+                </a>
+                <a href="/products.html?category=Fashion" class="category-card">
+                    <i class="fa-solid fa-shirt cat-icon"></i>
+                    <span class="cat-name">Fashion</span>
+                </a>
+                <a href="/products.html?category=Accessories" class="category-card">
+                    <i class="fa-solid fa-gem cat-icon"></i>
+                    <span class="cat-name">Accessories</span>
+                </a>
+                <a href="/products.html?category=Home" class="category-card">
+                    <i class="fa-solid fa-couch cat-icon"></i>
+                    <span class="cat-name">Home</span>
+                </a>
+                <a href="/products.html?category=Beauty" class="category-card">
+                    <i class="fa-solid fa-spa cat-icon"></i>
+                    <span class="cat-name">Beauty</span>
+                </a>
+                <a href="/products.html?category=Books" class="category-card">
+                    <i class="fa-solid fa-book-open cat-icon"></i>
+                    <span class="cat-name">Books</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURED PRODUCTS -->
+    <section class="section" style="background-color: var(--secondary-section); border-top: 1px solid var(--input-border); border-bottom: 1px solid var(--input-border);">
+        <div class="container">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">Featured Products</h2>
+                    <p style="color: var(--text-secondary); margin-top: 4px;">Top recommendations chosen for performance & aesthetic appeal</p>
+                </div>
+                <a href="/products.html" class="btn btn-primary btn-sm">See Full Catalog</a>
+            </div>
+
+            <div class="products-grid" id="home-featured-products">
+                <!-- Injected dynamically via JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- POPULAR PRODUCTS SECTION -->
+    <section class="section">
+        <div class="container">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">Popular Trends</h2>
+                    <p style="color: var(--text-secondary); margin-top: 4px;">Loved by hundreds of happy shoppers</p>
+                </div>
+                <a href="/products.html" class="btn btn-outline btn-sm">Explore More</a>
+            </div>
+
+            <div class="products-grid" id="home-popular-products">
+                <!-- Injected dynamically via JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container footer-grid">
+            <div class="footer-col">
+                <div class="brand-logo" style="margin-bottom: 16px;">
+                    <div class="brand-logo-text">
+                        <div class="brand-top" style="color: var(--white);">RUTHRA</div>
+                        <div class="brand-bottom" style="color: var(--light);">MART</div>
+                    </div>
+                </div>
+                <p style="color: rgba(255, 255, 255, 0.75); font-size: 0.95rem; max-width: 320px; line-height: 1.6;">
+                    RuthraMart is a multi-seller online shopping destination delivering aesthetic, functional, and durable goods directly to your doorstep.
+                </p>
+            </div>
+            <div class="footer-col">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="/index.html">Home</a></li>
+                    <li><a href="/products.html">All Products</a></li>
+                    <li><a href="/cart.html">Shopping Cart</a></li>
+                    <li><a href="/orders.html">Track Orders</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Partner with Us</h4>
+                <ul>
+                    <li><a href="/register.html">Become a Seller</a></li>
+                    <li><a href="/seller-dashboard.html">Seller Hub</a></li>
+                    <li><a href="/admin-dashboard.html">Admin Portal</a></li>
+                    <li><a href="/profile.html">My Account</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Customer Care</h4>
+                <ul>
+                    <li><a href="javascript:void(0)" onclick="chatbot.toggleChat()">AI Shopping Assistant</a></li>
+                    <li><a href="mailto:support@ruthramart.com">support@ruthramart.com</a></li>
+                    <li><span style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">+91 98765 43210</span></li>
+                    <li><span style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">Chennai, Tamil Nadu</span></li>
+                </ul>
+            </div>
+        </div>
+        <div class="container footer-bottom">
+            <p>&copy; 2026 RuthraMart. All rights reserved. Designed for College Capstone Evaluation.</p>
+            <p>Theme: Forest Sage, Deep Olive & Warm Ivory</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/products.js"></script>
+    <script src="/js/chatbot.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const products = await api.get('/products');
+                if (products && products.length > 0) {
+                    const featuredGrid = document.getElementById('home-featured-products');
+                    const popularGrid = document.getElementById('home-popular-products');
+
+                    if (featuredGrid) {
+                        const featItems = products.slice(0, 4);
+                        renderCards(featuredGrid, featItems);
+                    }
+
+                    if (popularGrid) {
+                        const popItems = products.slice(4, 8);
+                        renderCards(popularGrid, popItems);
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to load home products', e);
+            }
+        });
+
+        function renderCards(targetEl, items) {
+            targetEl.innerHTML = items.map(p => `
+                <div class="product-card">
+                    <div class="product-image-wrap">
+                        <img src="${p.imageUrl}" alt="${p.name}" loading="lazy">
+                        <span class="product-badge">${p.category}</span>
+                    </div>
+                    <div class="product-info">
+                        <div class="product-category">${p.category}</div>
+                        <a href="/product-details.html?id=${p.id}" class="product-title">${p.name}</a>
+                        <div class="product-rating">
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star-half-stroke"></i>
+                            <span>(4.9)</span>
+                        </div>
+                        <div class="product-price-row">
+                            <div class="product-price">${api.formatCurrency(p.price)}</div>
+                            <div class="product-stock ${p.stockQuantity <= 0 ? 'out-of-stock' : ''}">
+                                ${p.stockQuantity > 0 ? `In Stock (${p.stockQuantity})` : 'Out of Stock'}
+                            </div>
+                        </div>
+                        <div class="product-actions">
+                            <button class="btn btn-primary btn-block btn-sm" onclick="productsManager.quickAddToCart(${p.id}, ${p.stockQuantity})">
+                                <i class="fa-solid fa-cart-shopping"></i> Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+    </script>
 </body>
 </html>

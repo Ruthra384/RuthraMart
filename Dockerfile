@@ -25,6 +25,7 @@ WORKDIR /app
 
 # Non-root user for cloud security best practices
 RUN addgroup --system spring && adduser --system spring --ingroup spring
+RUN mkdir -p /app/data && chown -R spring:spring /app/data
 USER spring:spring
 
 # Copy built JAR from build stage

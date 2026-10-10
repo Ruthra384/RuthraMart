@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Products - RuthraMart Seller Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="/index.html" class="brand-logo">
+                <div class="brand-logo-text">
+                    <div class="brand-top">RUTHRA</div>
+                    <div class="brand-bottom">MART</div>
+                </div>
+            </a>
+            <div style="color: var(--light); font-weight: 700;">Merchant Center</div>
+            <ul class="nav-links">
+                <li><a href="/index.html" class="nav-link">Storefront</a></li>
+                <li id="nav-auth-links"></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="dashboard-wrapper">
+        <aside class="dashboard-sidebar">
+            <div class="sidebar-title">Seller Hub</div>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item">
+                    <a href="/seller-dashboard.html"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+                </li>
+                <li class="sidebar-item active">
+                    <a href="/seller-products.html"><i class="fa-solid fa-boxes-stacked"></i> My Products</a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="/seller-orders.html"><i class="fa-solid fa-receipt"></i> Orders Received</a>
+                </li>
+                <li class="sidebar-item" style="margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 16px;">
+                    <a href="javascript:void(0)" onclick="auth.logout()"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="dashboard-main">
+            <div id="alert-box" class="alert" style="display: none;"></div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px;">
+                <div>
+                    <h1 style="font-size: 2rem; color: var(--secondary);">Manage Products</h1>
+                    <p style="color: var(--text-secondary);">Add, update pricing, or edit stock quantities for your listings</p>
+                </div>
+                <button class="btn btn-primary" onclick="openProductModal()">
+                    <i class="fa-solid fa-plus"></i> Add Product
+                </button>
+            </div>
+
+            <!-- Products Table -->
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Product Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="seller-products-body">
+                        <tr><td colspan="6" style="text-align: center; color: var(--text-secondary);">Loading products...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- ADD / EDIT PRODUCT MODAL -->
+    <div class="modal-overlay" id="product-modal">
+        <div class="modal-card" style="max-width: 600px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 id="modal-title" style="color: var(--secondary);">Add Product</h3>
+                <button onclick="closeProductModal()" style="background: none; border: none; font-size: 1.4rem; cursor: pointer; color: var(--text-secondary);">&times;</button>
+            </div>
+
+            <form id="product-form" onsubmit="handleProductSubmit(event)">
+                <input type="hidden" id="prod-id">
+
+                <div class="form-group">
+                    <label class="form-label" for="prod-name">Product Name</label>
+                    <input type="text" id="prod-name" class="form-control" required placeholder="e.g. Ergonomic Office Chair">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label class="form-label" for="prod-category">Category</label>
+                        <select id="prod-category" class="form-select" required>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Fashion">Fashion</option>
+                            <option value="Accessories">Accessories</option>
+                            <option value="Home">Home</option>
+                            <option value="Beauty">Beauty</option>
+                            <option value="Books">Books</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="prod-price">Price (₹)</label>
+                        <input type="number" id="prod-price" class="form-control" step="0.01" min="1" required placeholder="1499">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label class="form-label" for="prod-stock">Stock Quantity</label>
+                        <input type="number" id="prod-stock" class="form-control" min="0" required placeholder="25">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="prod-image">Image URL</label>
+                        <input type="url" id="prod-image" class="form-control" placeholder="https://images.unsplash.com/...">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="prod-desc">Description</label>
+                    <textarea id="prod-desc" class="form-control" rows="3" placeholder="Provide product features, dimensions, specifications..."></textarea>
+                </div>
+
+                <div style="display: flex; gap: 12px; margin-top: 24px;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;" id="save-prod-btn">
+                        Save Product
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="closeProductModal()">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/chatbot.js"></script>
+    <script>
+        let sellerProducts = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!auth.requireAuth(['SELLER', 'ADMIN'])) return;
+            await loadSellerProducts();
+
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('action') === 'new') {
+                openProductModal();
+            }
+        });
+
+        async function loadSellerProducts() {
+            try {
+                sellerProducts = await api.get('/products/seller');
+                const tbody = document.getElementById('seller-products-body');
+                if (sellerProducts.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 30px;">You have not listed any products yet. Click "Add Product" to create your first listing!</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = sellerProducts.map(p => `
+                    <tr>
+                        <td>
+                            <img src="${p.imageUrl || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=80'}" 
+                                 alt="${p.name}" style="width: 50px; height: 50px; object-fit: cover; border-radius: var(--radius-sm);">
+                        </td>
+                        <td><strong>${p.name}</strong></td>
+                        <td>${p.category}</td>
+                        <td><strong style="color: var(--secondary);">${api.formatCurrency(p.price)}</strong></td>
+                        <td><span style="font-weight: 700; color: ${p.stockQuantity > 0 ? 'var(--success)' : 'var(--error)'};">${p.stockQuantity}</span></td>
+                        <td>
+                            <button class="btn btn-outline btn-sm" onclick="editProduct(${p.id})" style="margin-right: 6px;">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <button class="btn btn-outline btn-sm" style="color: var(--error); border-color: #f0c5c5;" onclick="deleteProduct(${p.id})">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function openProductModal() {
+            document.getElementById('modal-title').textContent = 'Add New Product';
+            document.getElementById('product-form').reset();
+            document.getElementById('prod-id').value = '';
+            document.getElementById('product-modal').classList.add('active');
+        }
+
+        function closeProductModal() {
+            document.getElementById('product-modal').classList.remove('active');
+        }
+
+        function editProduct(id) {
+            const product = sellerProducts.find(p => p.id === id);
+            if (!product) return;
+
+            document.getElementById('modal-title').textContent = 'Edit Product';
+            document.getElementById('prod-id').value = product.id;
+            document.getElementById('prod-name').value = product.name;
+            document.getElementById('prod-category').value = product.category;
+            document.getElementById('prod-price').value = product.price;
+            document.getElementById('prod-stock').value = product.stockQuantity;
+            document.getElementById('prod-image').value = product.imageUrl || '';
+            document.getElementById('prod-desc').value = product.description || '';
+
+            document.getElementById('product-modal').classList.add('active');
+        }
+
+        async function handleProductSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('prod-id').value;
+            const payload = {
+                name: document.getElementById('prod-name').value.trim(),
+                category: document.getElementById('prod-category').value,
+                price: parseFloat(document.getElementById('prod-price').value),
+                stockQuantity: parseInt(document.getElementById('prod-stock').value),
+                imageUrl: document.getElementById('prod-image').value.trim(),
+                description: document.getElementById('prod-desc').value.trim()
+            };
+
+            const btn = document.getElementById('save-prod-btn');
+            btn.disabled = true;
+
+            try {
+                if (id) {
+                    await api.put(`/products/${id}`, payload);
+                    api.showAlert('Product updated successfully!', 'success');
+                } else {
+                    await api.post('/products', payload);
+                    api.showAlert('Product added successfully!', 'success');
+                }
+                closeProductModal();
+                await loadSellerProducts();
+            } catch (err) {
+                api.showAlert(err.message || 'Operation failed', 'error');
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function deleteProduct(id) {
+            if (!confirm('Are you sure you want to delete this product?')) return;
+            try {
+                await api.delete(`/products/${id}`);
+                api.showAlert('Product deleted successfully.', 'success');
+                await loadSellerProducts();
+            } catch (e) {
+                api.showAlert(e.message || 'Failed to delete product', 'error');
+            }
+        }
+    </script>
+</body>
+</html>

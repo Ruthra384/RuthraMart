@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - RuthraMart Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="/index.html" class="brand-logo">
+                <div class="brand-logo-text">
+                    <div class="brand-top">RUTHRA</div>
+                    <div class="brand-bottom">MART</div>
+                </div>
+            </a>
+            <div style="color: var(--light); font-weight: 700;">
+                <i class="fa-solid fa-gauge-high"></i> Administrative Portal
+            </div>
+            <ul class="nav-links">
+                <li><a href="/index.html" class="nav-link">Storefront</a></li>
+                <li id="nav-auth-links"></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- DASHBOARD LAYOUT -->
+    <div class="dashboard-wrapper">
+        <aside class="dashboard-sidebar">
+            <div class="sidebar-title">Admin Console</div>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item active">
+                    <a href="/admin-dashboard.html"><i class="fa-solid fa-chart-pie"></i> Overview</a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="/admin-users.html"><i class="fa-solid fa-users"></i> Users & Roles</a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="/admin-products.html"><i class="fa-solid fa-boxes-stacked"></i> Products Oversight</a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="/admin-orders.html"><i class="fa-solid fa-clipboard-list"></i> Platform Orders</a>
+                </li>
+                <li class="sidebar-item" style="margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 16px;">
+                    <a href="javascript:void(0)" onclick="auth.logout()"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="dashboard-main">
+            <div id="alert-box" class="alert" style="display: none;"></div>
+
+            <div style="margin-bottom: 28px;">
+                <h1 style="font-size: 2rem; color: var(--secondary);">System Overview</h1>
+                <p style="color: var(--text-secondary);">Real-time statistics across all users, products and platform transactions</p>
+            </div>
+
+            <!-- 6 Admin Statistic Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+                    <div>
+                        <div class="stat-label">Total Users</div>
+                        <div class="stat-value" id="adm-users">0</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fa-solid fa-cart-shopping"></i></div>
+                    <div>
+                        <div class="stat-label">Total Buyers</div>
+                        <div class="stat-value" id="adm-buyers">0</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fa-solid fa-store"></i></div>
+                    <div>
+                        <div class="stat-label">Total Sellers</div>
+                        <div class="stat-value" id="adm-sellers">0</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
+                    <div>
+                        <div class="stat-label">Total Products</div>
+                        <div class="stat-value" id="adm-products">0</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fa-solid fa-receipt"></i></div>
+                    <div>
+                        <div class="stat-label">Total Orders</div>
+                        <div class="stat-value" id="adm-orders">0</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+                    <div>
+                        <div class="stat-label">Total Sales</div>
+                        <div class="stat-value" id="adm-sales">₹0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Management Links -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; margin-top: 36px;">
+                <div style="background-color: var(--white); padding: 24px; border-radius: var(--radius-lg); border: 1px solid var(--input-border); box-shadow: var(--shadow-sm);">
+                    <h3 style="color: var(--secondary); margin-bottom: 8px;"><i class="fa-solid fa-user-shield" style="color: var(--primary);"></i> User Management</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px;">View buyers, sellers, contact numbers and registrations.</p>
+                    <a href="/admin-users.html" class="btn btn-outline btn-sm">Manage Users</a>
+                </div>
+                <div style="background-color: var(--white); padding: 24px; border-radius: var(--radius-lg); border: 1px solid var(--input-border); box-shadow: var(--shadow-sm);">
+                    <h3 style="color: var(--secondary); margin-bottom: 8px;"><i class="fa-solid fa-shield-virus" style="color: var(--primary);"></i> Product Moderation</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px;">Inspect vendor catalog and remove inappropriate listings.</p>
+                    <a href="/admin-products.html" class="btn btn-outline btn-sm">Inspect Catalog</a>
+                </div>
+                <div style="background-color: var(--white); padding: 24px; border-radius: var(--radius-lg); border: 1px solid var(--input-border); box-shadow: var(--shadow-sm);">
+                    <h3 style="color: var(--secondary); margin-bottom: 8px;"><i class="fa-solid fa-truck-ramp-box" style="color: var(--primary);"></i> Order Operations</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px;">Monitor shipping progress and update statuses system-wide.</p>
+                    <a href="/admin-orders.html" class="btn btn-outline btn-sm">View Orders</a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/chatbot.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!auth.requireAuth(['ADMIN'])) return;
+
+            try {
+                const stats = await api.get('/admin/stats');
+                document.getElementById('adm-users').textContent = stats.totalUsers || 0;
+                document.getElementById('adm-buyers').textContent = stats.totalBuyers || 0;
+                document.getElementById('adm-sellers').textContent = stats.totalSellers || 0;
+                document.getElementById('adm-products').textContent = stats.totalProducts || 0;
+                document.getElementById('adm-orders').textContent = stats.totalOrders || 0;
+                document.getElementById('adm-sales').textContent = api.formatCurrency(stats.totalSales || 0);
+            } catch (e) {
+                console.error('Failed to load admin stats', e);
+            }
+        });
+    </script>
+</body>
+</html>

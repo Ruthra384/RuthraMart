@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Orders - RuthraMart Seller Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="/index.html" class="brand-logo">
+                <div class="brand-logo-text">
+                    <div class="brand-top">RUTHRA</div>
+                    <div class="brand-bottom">MART</div>
+                </div>
+            </a>
+            <div style="color: var(--light); font-weight: 700;">Merchant Center</div>
+            <ul class="nav-links">
+                <li><a href="/index.html" class="nav-link">Storefront</a></li>
+                <li id="nav-auth-links"></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="dashboard-wrapper">
+        <aside class="dashboard-sidebar">
+            <div class="sidebar-title">Seller Hub</div>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item">
+                    <a href="/seller-dashboard.html"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="/seller-products.html"><i class="fa-solid fa-boxes-stacked"></i> My Products</a>
+                </li>
+                <li class="sidebar-item active">
+                    <a href="/seller-orders.html"><i class="fa-solid fa-receipt"></i> Orders Received</a>
+                </li>
+                <li class="sidebar-item" style="margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 16px;">
+                    <a href="javascript:void(0)" onclick="auth.logout()"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="dashboard-main">
+            <div id="alert-box" class="alert" style="display: none;"></div>
+
+            <div style="margin-bottom: 28px;">
+                <h1 style="font-size: 2rem; color: var(--secondary);">Incoming Customer Orders</h1>
+                <p style="color: var(--text-secondary);">Fulfill, ship and update statuses for products purchased from your store</p>
+            </div>
+
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Buyer Details</th>
+                            <th>Delivery Address</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Update Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="seller-orders-body">
+                        <tr><td colspan="6" style="text-align: center; color: var(--text-secondary);">Loading orders...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/chatbot.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!auth.requireAuth(['SELLER', 'ADMIN'])) return;
+            await loadOrders();
+        });
+
+        async function loadOrders() {
+            try {
+                const orders = await api.get('/orders');
+                const tbody = document.getElementById('seller-orders-body');
+                if (orders.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 30px;">No customer orders received yet.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = orders.map(o => `
+                    <tr>
+                        <td><strong>${o.orderNumber}</strong><br><small style="color: var(--text-secondary);">${api.formatDate(o.createdAt)}</small></td>
+                        <td>
+                            <strong>${o.buyerName}</strong><br>
+                            <small style="color: var(--text-secondary);">${o.email}</small><br>
+                            <small style="color: var(--text-secondary);">${o.phone}</small>
+                        </td>
+                        <td style="max-width: 220px; font-size: 0.85rem;">${o.deliveryAddress}</td>
+                        <td><strong style="color: var(--secondary);">${api.formatCurrency(o.totalAmount)}</strong></td>
+                        <td><span class="badge badge-${(o.status || 'pending').toLowerCase()}">${o.status}</span></td>
+                        <td>
+                            <select class="form-select" style="padding: 6px 10px; font-size: 0.85rem;" onchange="updateStatus(${o.id}, this.value)">
+                                <option value="Pending" ${o.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                                <option value="Confirmed" ${o.status === 'Confirmed' ? 'selected' : ''}>Confirmed</option>
+                                <option value="Shipped" ${o.status === 'Shipped' ? 'selected' : ''}>Shipped</option>
+                                <option value="Delivered" ${o.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+                                <option value="Cancelled" ${o.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+                            </select>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function updateStatus(orderId, newStatus) {
+            try {
+                await api.put(`/orders/${orderId}/status`, { status: newStatus });
+                api.showAlert(`Order updated to ${newStatus}`, 'success');
+                await loadOrders();
+            } catch (e) {
+                api.showAlert(e.message || 'Failed to update order status', 'error');
+            }
+        }
+    </script>
+</body>
+</html>

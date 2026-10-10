@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products - RuthraMart</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .category-filter-bar {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding: 12px 0 20px;
+            scrollbar-width: none;
+        }
+        .category-filter-bar::-webkit-scrollbar {
+            display: none;
+        }
+        .category-filter-btn {
+            background-color: var(--white);
+            border: 1px solid var(--input-border);
+            padding: 8px 18px;
+            border-radius: var(--radius-full);
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--secondary);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: var(--transition);
+        }
+        .category-filter-btn:hover, .category-filter-btn.active {
+            background-color: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="/index.html" class="brand-logo">
+                <div class="brand-logo-text">
+                    <div class="brand-top">RUTHRA</div>
+                    <div class="brand-bottom">MART</div>
+                </div>
+            </a>
+
+            <div class="nav-search">
+                <form onsubmit="event.preventDefault(); productsManager.handleSearch(document.getElementById('nav-search-input').value);">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" id="nav-search-input" placeholder="Search laptops, shirts, watches...">
+                </form>
+            </div>
+
+            <button class="nav-toggle" id="nav-toggle"><i class="fa-solid fa-bars"></i></button>
+
+            <ul class="nav-links" id="nav-links">
+                <li><a href="/index.html" class="nav-link">Home</a></li>
+                <li><a href="/products.html" class="nav-link active">Products</a></li>
+                <li>
+                    <a href="/cart.html" class="nav-link">
+                        <i class="fa-solid fa-cart-shopping"></i> Cart
+                        <span class="cart-badge" id="cart-count">0</span>
+                    </a>
+                </li>
+                <li><a href="/orders.html" class="nav-link"><i class="fa-solid fa-bag-shopping"></i> Orders</a></li>
+                <li id="nav-auth-links" style="display: flex; align-items: center; gap: 12px;"></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- CONTENT -->
+    <div class="container" style="padding-top: 36px; padding-bottom: 60px;">
+        <div id="alert-box" class="alert" style="display: none;"></div>
+
+        <!-- Header -->
+        <div style="margin-bottom: 24px;">
+            <h1 style="font-size: 2.2rem; color: var(--secondary); margin-bottom: 8px;">Explore Our Catalog</h1>
+            <p style="color: var(--text-secondary);">Browse authentic products from certified sellers</p>
+        </div>
+
+        <!-- Category Filters -->
+        <div class="category-filter-bar" id="category-filter-list">
+            <!-- Rendered by productsManager.renderCategoryFilters() -->
+        </div>
+
+        <!-- Products Grid -->
+        <div class="products-grid" id="products-grid" style="margin-top: 20px;">
+            <!-- Rendered by productsManager.renderProducts() -->
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container footer-bottom" style="border-top: none; padding-top: 0;">
+            <p>&copy; 2026 RuthraMart. Multi Seller Online Shopping.</p>
+            <p>Theme: Forest Sage & Warm Ivory</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/products.js"></script>
+    <script src="/js/chatbot.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            productsManager.init();
+        });
+    </script>
+</body>
+</html>
